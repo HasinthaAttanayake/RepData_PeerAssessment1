@@ -1,0 +1,91 @@
+---
+output: html_document
+---
+---
+title: 'Reproducible Research [Coursera]: Assignment 1'
+author: "Hasintha Attanayake"
+date: "16 June 2016"
+output: html_document
+---    
+**The following document consists of secondary headings as dictated by the assignment instructions and tertiary headings for subdivisions of assigned tasks**  
+## Loading and preprocessing the data  
+### Loading the raw data  
+
+The file 'activity.csv' should be located within main repository / working directory of R markdown file and will be imported into the work environment using **read.csv()**    
+
+```{r echo = TRUE}  
+activity <- read.csv('activity.csv', header = TRUE)
+```
+
+### Preprocessing the raw data  
+
+The raw dataframe *activity* will be simplified by removing all **NA** values with the **na.omit** function. (missing values ignored) 
+
+```{r, echo = TRUE}    
+activity_processed <- na.omit(activity)  
+```
+
+*For the following two parts of the assingment the preprocessed simplified data is used*
+
+### What is mean total number of steps taken per day?
+
+**1. Calculate the total number of steps taken each day**
+
+Analysis for this section will be performed using the **plyr** package in R and the **ddply()** function to split, apply **mean()** function and recombine/summarise the data set. A small sample of the data set is previewed using the **head()** function.
+
+
+``` {r, echo=TRUE}
+library(plyr)
+summary_steps <- ddply(activity_processed,.(date),summarise, steps_per_day = sum(steps))
+head(summary_steps)
+```  
+
+**2. Make a histogram of the total number of steps taken each day**
+
+Plotted using basic function with breaks (size bins) in the frequency histogram of 5 and 20 for comparison.  
+
+**5 size bins:**
+
+``` {r, echo=TRUE}
+
+hist(summary_steps$steps_per_day, breaks = 5, xlab = "Steps taken per day", main ="Frequency Histogram of Steps taken per day (5 breaks)")
+abline(v = median(summary_steps$steps_per_day),col = "royalblue", lwd = 2)
+abline(v = mean(summary_steps$steps_per_day),col = "red", lwd = 2)
+legend(x = "topright", c("mean","median"), col = c("red","royalblue"), lwd = c(2,2))
+```  
+
+**20 size bins:**  
+
+```{r,echo=TRUE}
+hist(summary_steps$steps_per_day, breaks = 20, xlab = "Steps taken per day", main ="Frequency Histogram of Steps taken per day (20 breaks)")
+abline(v = median(summary_steps$steps_per_day),col = "royalblue", lwd = 2)
+abline(v = mean(summary_steps$steps_per_day),col = "red", lwd = 2)
+legend(x = "topright", c("mean","median"), col = c("red","royalblue"), lwd = c(2,2))
+```
+
+**3. Calculate and report the mean and median of the total number of steps taken per day**
+
+Simply done using the **mean()** and **median()** functions applied to the *steps_taken_per_day* column of the *summary_steps* dataframe. 
+
+```{r,echo=TRUE}
+mean_steps <- mean(summary_steps$steps_per_day)
+median_steps <- median(summary_steps$steps_per_day)
+```
+```{r,echo=TRUE}
+mean_steps
+```
+```{r,echo=TRUE}
+median_steps
+```
+
+**Validation for mean:**  
+Simple validation of mean using preprocessed data (not raw). Total steps determined by using **sum()** function on *steps* column in the *activitysimple* dataframe.Total days calculated by applying **unique()** and **length** fuctions to the *date* column in the *activity_processed* dataframe. Mean steps per day is equal to total steps divided by total day.s.
+
+``` {r, echo = TRUE}
+total_steps <- sum(activity_processed$steps)
+total_days <- length(unique(activity_processed$date)) 
+validated_mean <- total_steps/total_days
+```
+``` {r, echo = TRUE}
+validated_mean 
+```
